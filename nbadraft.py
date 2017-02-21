@@ -1,49 +1,55 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas
+import numpy as np
 
+import matplotlib.pyplot as ppt
+import seaborn
 
-draft_year = int(input("Please enter a NBA draft year: "))
+url_draft_years = "http://www.basketball-reference.com/draft/NBA_{year}.html"
 
-url = "http://www.basketball-reference.com/draft/NBA_%d.html" % draft_year
+all_drafts = pandas.DataFrame()
 
-# draft_year = 2016
-# url = "http://www.basketball-reference.com/draft/NBA_.html"
+#combine draft data from 1996 to current to one data frame
+for year in range(1996, 2017):
+    url = url_draft_years.format(year=year)
 
-html_from_url = urlopen(url)
+    html_from_url = urlopen(url)
 
-bs = BeautifulSoup(html_from_url, 'html.parser')
+    bs = BeautifulSoup(html_from_url, 'html.parser')
 
-table_row = bs.findAll('tr', limit=2)[1].findAll('th')
+    table_row = bs.findAll('tr', limit=2)[1].findAll('th')
 
-headers = [th.getText() for th in bs.findAll('tr', limit=2)[1].findAll('th')]
+    headers = [th.getText() for th in bs.findAll('tr', limit=2)[1].findAll('th')]
+    headers.remove('Pk')
 
-#player data starts after 2nd table record
-player_data_rows = bs.findAll('tr')[2:]
+    #player data starts after 2nd table record
+    player_data_rows = bs.findAll('tr')[2:]
 
-player_data = [[td.getText() for td in player_data_rows[i].findAll('td')]
-               for i in range(len(player_data_rows))]
+    player_data = [[td.getText() for td in player_data_rows[i].findAll('td')]
+                   for i in range(len(player_data_rows))]
 
-#Redundant data
-headers.remove('Pk')
+    year_data_frame = pandas.DataFrame(player_data, columns=headers)
+    year_data_frame.insert(0, 'Draft Year', year)
 
-data_frame = pandas.DataFrame( player_data, columns=headers )
+    all_drafts = all_drafts.append(year_data_frame, ignore_index=True)
+
+# Convert data to proper data types
+all_drafts = all_drafts.convert_objects(convert_numeric=True)
 
 #remove any rows that have null data
-data_frame = data_frame[data_frame.Player.notnull()]
-
-# Make header names more readable/clear
-data_frame.rename(columns={'WS/48': 'WS per 48'}, inplace=True)
-data_frame.columns = data_frame.columns.str.replace('%', '_PERC')
-
-data_frame.columns.values[13:18] = [data_frame.columns.values[13:18][col] + " per Game" for col in range(5)]
-
-data_frame = data_frame.convert_objects(convert_numeric=True)
+all_drafts = all_drafts[all_drafts.Player.notnull()]
 
 #fill Not A Numbers to 0 and change some columns to int
-data_frame = data_frame[:].fillna(0)
-data_frame.loc[:,'Yrs':'AST'] = data_frame.loc[:, 'Yrs':'AST'].astype(int)
+all_drafts = all_drafts[:].fillna(0)
 
-data_frame.insert(1, 'Draft Year', draft_year)
+# Make header names more readable/clear
+all_drafts.rename(columns={'WS/48': 'WS per 48'}, inplace=True)
+all_drafts.columns = all_drafts.columns.str.replace('%', '_PERC')
 
-print(data_frame.head())
+all_drafts.columns.values[13:18] = [all_drafts.columns.values[13:18][col] + " per Game" for col in range(5)]
+
+all_drafts.loc[:,'Yrs':'AST'] = all_drafts.loc[:,'Yrs':'AST'].astype(int)
+
+all_drafts.to_csv("draft_data_1996_to_2016.csv")
+
