@@ -63,3 +63,14 @@ ppt.figure(figsize=(13,10))
 
 x_values = draft_df.Draft_Year.unique()
 y_values = WS48_yearly_avg
+ppt.title('Average Career Win Shares per 48 minutes by Draft Year (1996-2016)', fontsize=20)
+ppt.ylabel('Win Shares per 48 minutes', fontsize=18)
+ppt.xlim(1996, 2016)
+ppt.ylim(0, .10)
+ppt.grid(axis='y', color='grey', linestyle='--', lw=0.5, alpha=0.5)
+ppt.tick_params(axis='both', labelsize=14)
+
+seaborn.despine(left=True, bottom=True)
+
+ppt.plot(x_values, y_values)
+ppt.show()
