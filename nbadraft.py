@@ -2,9 +2,11 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas
 import numpy as np
-
 import matplotlib.pyplot as ppt
 import seaborn
+
+from pathlib import Path
+
 
 url_draft_years = "http://www.basketball-reference.com/draft/NBA_{year}.html"
 
@@ -73,4 +75,32 @@ ppt.tick_params(axis='both', labelsize=14)
 seaborn.despine(left=True, bottom=True)
 
 ppt.plot(x_values, y_values)
-ppt.show()
+
+ws_48_image = Path('ws_48_avg.png')
+if not ws_48_image.is_file():
+    ppt.savefig('ws_48_avg.png')
+
+#plot ws/48 for first round draft picks only
+first_round_picks = draft_df[draft_df['Rk'] < 31]
+first_round_ws48 = first_round_picks.groupby('Draft_Year').WS_per_48.mean()
+
+seaborn.set_style("white")
+ppt.figure(figsize=(13,10))
+
+x_values_first_round = draft_df.Draft_Year.unique()
+y_values_first_round = first_round_ws48
+ppt.title('Average Career Win Shares per 48 minutes for First Round Draft Picks (1996-2016)', fontsize=20)
+ppt.ylabel('Win Shares per 48 minutes', fontsize=18)
+ppt.xlim(1996, 2016)
+ppt.ylim(0,.11)
+ppt.grid(axis='y', color='red', linestyle='--', lw=0.5, alpha=0.5)
+ppt.tick_params(axis='both', labelsize=15)
+
+seaborn.despine(left=True, bottom=True)
+
+ppt.plot(x_values_first_round, y_values_first_round)
+
+ws_48_firstround_image = Path('first_round_picks_ws48_avg.png')
+if not ws_48_firstround_image.is_file():
+    ppt.savefig('first_round_picks_ws48_avg.png')
+
