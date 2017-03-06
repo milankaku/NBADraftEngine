@@ -80,27 +80,48 @@ ws_48_image = Path('ws_48_avg.png')
 if not ws_48_image.is_file():
     ppt.savefig('ws_48_avg.png')
 
-#plot ws/48 for first round draft picks only
+#plot WS/48 of first round and second round picks on same plot
+seaborn.set_style("white")
+seaborn.set_color_codes()
+
 first_round_picks = draft_df[draft_df['Rk'] < 31]
 first_round_ws48 = first_round_picks.groupby('Draft_Year').WS_per_48.mean()
+second_round_picks = draft_df[draft_df['Rk'] >= 31]
+second_round_ws48 = second_round_picks.groupby('Draft_Year').WS_per_48.mean()
 
-seaborn.set_style("white")
-ppt.figure(figsize=(13,10))
-
-x_values_first_round = draft_df.Draft_Year.unique()
-y_values_first_round = first_round_ws48
-ppt.title('Average Career Win Shares per 48 minutes for First Round Draft Picks (1996-2016)', fontsize=20)
-ppt.ylabel('Win Shares per 48 minutes', fontsize=18)
-ppt.xlim(1996, 2016)
-ppt.ylim(0,.11)
-ppt.grid(axis='y', color='red', linestyle='--', lw=0.5, alpha=0.5)
+fig, ax1 = ppt.subplots(figsize=(14,11))
+ppt.title('Average Career Win Shares per 48 minutes for First Round and Second Round Draft Picks (1996-2016)', fontsize=20)
+ppt.grid(axis='y', color='grey', linestyle='--', lw=0.5, alpha=0.5)
 ppt.tick_params(axis='both', labelsize=15)
 
-seaborn.despine(left=True, bottom=True)
+plot1 = ax1.plot(x_values, first_round_ws48, 'b', label='First Round Picks Avg Career WS/48')
+ax1.set_ylabel('Win Shares per 48 minutes', fontsize=18)
+ax1.set_ylim(0, .11)
 
-ppt.plot(x_values_first_round, y_values_first_round)
+for tl in ax1.get_yticklabels():
+    tl.set_color('b')
 
-ws_48_firstround_image = Path('first_round_picks_ws48_avg.png')
-if not ws_48_firstround_image.is_file():
-    ppt.savefig('first_round_picks_ws48_avg.png')
+#second Axes object for second round picks
+ax2 = ax1.twinx()
+plot2 = ax2.plot(x_values, second_round_ws48, 'r', label='Second Round Picks Avg Career WS/48')
+ax2.set_ylabel('Win Shares per 48 minutes', fontsize=18)
+ax2.set_ylim(0, .11)
+
+for tl in ax2.get_yticklabels():
+    tl.set_color('r')
+ax2.set_xlim(1996, 2017)
+
+lines = plot1 + plot2
+ax1.legend(lines, [l.get_label() for l in lines])
+for ax in [ax1, ax2]:
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+ws_48_comapare_image = Path('first_round_second_round_ws48_avg.png')
+if not ws_48_comapare_image.is_file():
+    ppt.savefig('first_round_second_round_ws48_avg.png')
+
+
 
