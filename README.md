@@ -6,6 +6,8 @@
 data from http://www.basketball-reference.com/ using BeautifulSoup. Different visualizations are created to interpret and analyze the data and player statistics.
 Pandas, Matplotlib, and Seaborn libraries are utilized to visually represent this data.
 
+## Research
+
 First, I wanted to see the strength of draft classes over time by using Win Shares per 48 minutes (WS/48). This advanced statistic is a complex formula that is used to determine how much a player contributes to a team's win. I plotted the average WS/48 for all draft picks grouped by the year they were drafted (1996-2016).
 
 ![My image](https://github.com/milankaku/NBAStats/blob/master/graphs/ws_48_avg.png)
