@@ -7,6 +7,12 @@ from bs4 import BeautifulSoup
 
 
 def get_draft_data():
+    """
+    Return data frame of draft data from 1996-2016
+    in proper format and save as CSV.
+
+    :return: all_drafts: Pandas DataFrame
+    """
     url_draft_years = "http://www.basketball-reference.com/draft/NBA_{year}.html"
     all_drafts = pandas.DataFrame()
 
@@ -17,8 +23,6 @@ def get_draft_data():
         html_from_url = urlopen(url)
 
         bs = BeautifulSoup(html_from_url, 'html.parser')
-
-        table_row = bs.findAll('tr', limit=2)[1].findAll('th')
 
         headers = [th.getText() for th in bs.findAll('tr', limit=2)[1].findAll('th')]
         headers.remove('Pk')
@@ -58,7 +62,11 @@ def get_draft_data():
 
 
 def create_yearly_draft_ws48_plot(data_frame):
-    # plot WS per 48 yearly averages
+    """
+    Plot career average WS/48 by draft year
+
+    :param data_frame: Pandas DataFrame
+    """
     seaborn.set_style("white")
     ppt.figure(figsize=(13, 10))
 
@@ -79,6 +87,12 @@ def create_yearly_draft_ws48_plot(data_frame):
 
 
 def create_round_based_ws48_plot(data_frame):
+    """
+    Plot career average WS/48 for first and second round picks
+    by draft year
+
+    :param data_frame: Pandas DataFrame
+    """
     # plot WS/48 of first round and second round picks on same plot
     seaborn.set_style("white")
     seaborn.set_color_codes()
@@ -122,15 +136,16 @@ def create_round_based_ws48_plot(data_frame):
     ppt.savefig('../graphs/first_round_second_round_ws48_avg.png')
 
 
-def create_each_pick_ws48_plot(draft_frame):
-    # get average WS/48 by draft pick
-    all_picks = draft_frame[draft_frame['Rk'] < 61]
-    pick_avg_WS48 = all_picks.groupby('Rk').WS_per_48.mean()
+def create_each_pick_ws48_plot(data_frame):
+    """
+    Plot career average WS/48 by each draft pick
+    :param data_frame: Pandas DataFrame
+    """
+    all_picks = data_frame[data_frame['Rk'] < 61]
+    pick_avg_ws48 = all_picks.groupby('Rk').WS_per_48.mean()
 
     seaborn.set_style("white")
     ppt.figure(figsize=(13, 10))
-
-    x_picks = all_picks.Rk.unique()
 
     # create point plot
     ppt.figure(figsize=(9, 14))
@@ -153,7 +168,7 @@ def create_each_pick_ws48_plot(draft_frame):
     ax.xaxis.set_label_position('top')
 
     # add lines
-    for y in range(len(pick_avg_WS48)):
+    for y in range(len(pick_avg_ws48)):
         ax.hlines(y, -0.1, 0.16, color='grey', linestyle='--', lw=0.5)
     ax.vlines(0.00, -1, 60, color='grey', linestyle='--', lw=0.5)
 
