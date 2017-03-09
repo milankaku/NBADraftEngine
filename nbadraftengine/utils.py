@@ -1,12 +1,13 @@
-from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import pandas
+
 import matplotlib.pyplot as ppt
+import pandas
 import seaborn
+from bs4 import BeautifulSoup
+
 
 def get_draft_data():
     url_draft_years = "http://www.basketball-reference.com/draft/NBA_{year}.html"
-
     all_drafts = pandas.DataFrame()
 
     # combine draft data from 1996 to current to one data frame
@@ -119,6 +120,7 @@ def create_round_based_ws48_plot(data_frame):
         ax.spines["left"].set_visible(False)
 
     ppt.savefig('../graphs/first_round_second_round_ws48_avg.png')
+
 
 def create_each_pick_ws48_plot(draft_frame):
     # get average WS/48 by draft pick
