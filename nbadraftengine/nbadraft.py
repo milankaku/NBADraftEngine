@@ -54,9 +54,9 @@ all_drafts.columns.values[13:18] = [all_drafts.columns.values[13:18][col] + "_pe
 all_drafts.loc[:,'Yrs':'AST'] = all_drafts.loc[:,'Yrs':'AST'].astype(int)
 
 #save data frame as a CSV
-all_drafts.to_csv("csv/draft_data_1996_to_2016.csv")
+all_drafts.to_csv("../csv/draft_data_1996_to_2016.csv")
 
-draft_df = pandas.read_csv("csv/draft_data_1996_to_2016.csv", index_col=0)
+draft_df = pandas.read_csv("../csv/draft_data_1996_to_2016.csv", index_col=0)
 
 WS48_yearly_avg = draft_df.groupby('Draft_Year').WS_per_48.mean()
 
@@ -77,9 +77,9 @@ seaborn.despine(left=True, bottom=True)
 
 ppt.plot(x_values, y_values)
 
-ws_48_image = Path('graphs/ws_48_avg.png')
+ws_48_image = Path('../graphs/ws_48_avg.png')
 if not ws_48_image.is_file():
-    ppt.savefig('graphs/ws_48_avg.png')
+    ppt.savefig('../graphs/ws_48_avg.png')
 
 #plot WS/48 of first round and second round picks on same plot
 seaborn.set_style("white")
@@ -120,9 +120,9 @@ for ax in [ax1, ax2]:
     ax.spines["right"].set_visible(False)
     ax.spines["left"].set_visible(False)
 
-ws_48_comapare_image = Path('graphs/first_round_second_round_ws48_avg.png')
+ws_48_comapare_image = Path('../graphs/first_round_second_round_ws48_avg.png')
 if not ws_48_comapare_image.is_file():
-    ppt.savefig('graphs/first_round_second_round_ws48_avg.png')
+    ppt.savefig('../graphs/first_round_second_round_ws48_avg.png')
 
 #get average WS/48 by draft pick
 all_picks = draft_df[draft_df['Rk'] < 61]
@@ -158,6 +158,6 @@ for y in range(len(pick_avg_WS48)):
     ax.hlines(y, -0.1, 0.16, color='grey', linestyle='--', lw=0.5)
 ax.vlines(0.00, -1, 60, color='grey', linestyle='--', lw=0.5)
 
-ws_48_by_pick_image = Path('graphs/ws48_avg_by_pick.png')
+ws_48_by_pick_image = Path('../graphs/ws48_avg_by_pick.png')
 if not ws_48_by_pick_image.is_file():
-    ppt.savefig('graphs/ws48_avg_by_pick.png')
+    ppt.savefig('../graphs/ws48_avg_by_pick.png')
