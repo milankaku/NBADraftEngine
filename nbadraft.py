@@ -53,6 +53,7 @@ all_drafts.columns.values[13:18] = [all_drafts.columns.values[13:18][col] + "_pe
 
 all_drafts.loc[:,'Yrs':'AST'] = all_drafts.loc[:,'Yrs':'AST'].astype(int)
 
+#save data frame as a CSV
 all_drafts.to_csv("draft_data_1996_to_2016.csv")
 
 draft_df = pandas.read_csv("draft_data_1996_to_2016.csv", index_col=0)
@@ -122,6 +123,25 @@ for ax in [ax1, ax2]:
 ws_48_comapare_image = Path('first_round_second_round_ws48_avg.png')
 if not ws_48_comapare_image.is_file():
     ppt.savefig('first_round_second_round_ws48_avg.png')
+
+#get average WS/48 by draft pick
+all_picks = draft_df[draft_df['Rk'] < 61]
+pick_avg_WS48 = all_picks.groupby('Rk').WS_per_48.mean()
+
+seaborn.set_style("white")
+ppt.figure(figsize=(13,10))
+
+x_picks = all_picks.Pk.unique()
+
+#create point plot
+ppt.figure(figsize=(10,15))
+
+#plot point returns mean and confidence intervals at 95 CI by default
+ax = seaborn.pointplot(x='WS_Per_48', y='Draft Pick', join=False, data=all_picks, orient='h')
+title_per_pick_plot = ('Average Win Shares per 48 Minutes (with 95% CI)'
+         '\nfor each NBA Draft Pick in the Top 60 (1996-2016)')
+ax.set_title(title=title_per_pick_plot, fontsize=19, y=1.06)
+
 
 
 
