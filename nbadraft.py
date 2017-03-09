@@ -131,16 +131,37 @@ pick_avg_WS48 = all_picks.groupby('Rk').WS_per_48.mean()
 seaborn.set_style("white")
 ppt.figure(figsize=(13,10))
 
-x_picks = all_picks.Pk.unique()
+x_picks = all_picks.Rk.unique()
 
 #create point plot
-ppt.figure(figsize=(10,15))
+ppt.figure(figsize=(9,14))
 
 #plot point returns mean and confidence intervals at 95 CI by default
-ax = seaborn.pointplot(x='WS_Per_48', y='Draft Pick', join=False, data=all_picks, orient='h')
+ax = seaborn.pointplot(x='WS_per_48', y='Rk', join=False, data=all_picks, orient='h')
+
 title_per_pick_plot = ('Average Win Shares per 48 Minutes (with 95% CI)'
          '\nfor each NBA Draft Pick in the Top 60 (1996-2016)')
-ax.set_title(title=title_per_pick_plot, fontsize=19, y=1.06)
+ax.set_title(title_per_pick_plot, fontsize=10, y=1.06)
+ax.set_ylabel('Draft Pick', fontsize=8, rotation=0)
+ax.set_xlabel('WS/48', fontsize=8)
+ax.tick_params(axis='both', labelsize=7)
+
+#pad for y axis so no overlap
+ax.yaxis.labelpad = 28
+
+ax.set_xlim(-0.1, 0.16)
+ax.xaxis.tick_top()
+ax.xaxis.set_label_position('top')
+
+#add lines
+for y in range(len(pick_avg_WS48)):
+    ax.hlines(y, -0.1, 0.16, color='grey', linestyle='--', lw=0.5)
+ax.vlines(0.00, -1, 60, color='grey', linestyle='--', lw=0.5)
+
+ws_48_by_pick_image = Path('ws48_avg_by_pick.png')
+if not ws_48_by_pick_image.is_file():
+    ppt.savefig('ws48_avg_by_pick.png')
+
 
 
 
