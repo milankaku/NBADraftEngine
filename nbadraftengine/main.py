@@ -1,63 +1,13 @@
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
 import pandas
 import numpy as np
 import matplotlib.pyplot as ppt
 import seaborn
-
 from pathlib import Path
 
+import utils
 
 def main():
-    url_draft_years = "http://www.basketball-reference.com/draft/NBA_{year}.html"
-
-    all_drafts = pandas.DataFrame()
-
-    # combine draft data from 1996 to current to one data frame
-    for year in range(1996, 2017):
-        url = url_draft_years.format(year=year)
-
-        html_from_url = urlopen(url)
-
-        bs = BeautifulSoup(html_from_url, 'html.parser')
-
-        table_row = bs.findAll('tr', limit=2)[1].findAll('th')
-
-        headers = [th.getText() for th in bs.findAll('tr', limit=2)[1].findAll('th')]
-        headers.remove('Pk')
-
-        # player data starts after 2nd table record
-        player_data_rows = bs.findAll('tr')[2:]
-
-        player_data = [[td.getText() for td in player_data_rows[i].findAll('td')]
-                       for i in range(len(player_data_rows))]
-
-        year_data_frame = pandas.DataFrame(player_data, columns=headers)
-        year_data_frame.insert(0, 'Draft_Year', year)
-
-        all_drafts = all_drafts.append(year_data_frame, ignore_index=True)
-
-    # Convert data to proper data types
-    all_drafts = all_drafts.convert_objects(convert_numeric=True)
-
-    # remove any rows that have null data
-    all_drafts = all_drafts[all_drafts.Player.notnull()]
-
-    # fill Not A Numbers to 0 and change some columns to int
-    all_drafts = all_drafts[:].fillna(0)
-
-    # Make header names more readable/clear
-    all_drafts.rename(columns={'WS/48': 'WS_per_48'}, inplace=True)
-    all_drafts.columns = all_drafts.columns.str.replace('%', '_PERC')
-
-    all_drafts.columns.values[13:18] = [all_drafts.columns.values[13:18][col] + "_per_Game" for col in range(5)]
-
-    all_drafts.loc[:, 'Yrs':'AST'] = all_drafts.loc[:, 'Yrs':'AST'].astype(int)
-
-    # save data frame as a CSV
-    all_drafts.to_csv("../csv/draft_data_1996_to_2016.csv")
-
-    draft_df = pandas.read_csv("../csv/draft_data_1996_to_2016.csv", index_col=0)
+    draft_df = utils.get_draft_data()
 
     WS48_yearly_avg = draft_df.groupby('Draft_Year').WS_per_48.mean()
 
@@ -78,9 +28,7 @@ def main():
 
     ppt.plot(x_values, y_values)
 
-    ws_48_image = Path('../graphs/ws_48_avg.png')
-    if not ws_48_image.is_file():
-        ppt.savefig('../graphs/ws_48_avg.png')
+    ppt.savefig('../graphs/ws_48_avg.png')
 
     # plot WS/48 of first round and second round picks on same plot
     seaborn.set_style("white")
@@ -122,9 +70,7 @@ def main():
         ax.spines["right"].set_visible(False)
         ax.spines["left"].set_visible(False)
 
-    ws_48_comapare_image = Path('../graphs/first_round_second_round_ws48_avg.png')
-    if not ws_48_comapare_image.is_file():
-        ppt.savefig('../graphs/first_round_second_round_ws48_avg.png')
+    ppt.savefig('../graphs/first_round_second_round_ws48_avg.png')
 
     # get average WS/48 by draft pick
     all_picks = draft_df[draft_df['Rk'] < 61]
@@ -160,9 +106,7 @@ def main():
         ax.hlines(y, -0.1, 0.16, color='grey', linestyle='--', lw=0.5)
     ax.vlines(0.00, -1, 60, color='grey', linestyle='--', lw=0.5)
 
-    ws_48_by_pick_image = Path('../graphs/ws48_avg_by_pick.png')
-    if not ws_48_by_pick_image.is_file():
-        ppt.savefig('../graphs/ws48_avg_by_pick.png')
+    ppt.savefig('../graphs/ws48_avg_by_pick.png')
 
 
 if __name__ == '__main__':
