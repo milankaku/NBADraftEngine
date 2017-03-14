@@ -1,8 +1,8 @@
-# NBADraftEngine
+# nba-draftanalysis
 
 ## What is it
 
-**NBADraftEngine** is a  NBA Draft Application in development. It scrapes NBA draft and player
+**nba-draftanalysis** is a  NBA Draft Application in development. It scrapes NBA draft and player
 data from http://www.basketball-reference.com/ using BeautifulSoup. Different visualizations are created to interpret and analyze the data and player statistics.
 Pandas, Matplotlib, and Seaborn libraries are utilized to visually represent this data.
 
