@@ -1,4 +1,4 @@
-import nbadraftengine.utils as utils
+import utils
 
 
 def main():
